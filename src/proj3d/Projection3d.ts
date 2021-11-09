@@ -105,4 +105,39 @@ export class Projection3d extends LinearProjection<Matrix3d>
 
         this.local._dirtyId++;
     }
+
+    updateLocalTransform3d(lt: Matrix3d): void
+    {
+        if (this._projID === 0)
+        {
+            this.local.copyFrom3d(lt);
+
+            return;
+        }
+        const matrix = this.local;
+        const euler = this.euler;
+        const pos = this.position;
+        const scale = this.scale;
+        const pivot = this.pivot;
+
+        euler.update();
+
+        if (!this.cameraMode)
+        {
+            matrix.setToRotationTranslationScale(euler.quaternion, pos._x, pos._y, pos._z, scale._x, scale._y, scale._z);
+            matrix.translate(-pivot._x, -pivot._y, -pivot._z);
+            matrix.setToMult(lt, matrix);
+
+            return;
+        }
+
+        matrix.setToMult(lt, this.cameraMatrix);
+        matrix.translate(pivot._x, pivot._y, pivot._z);
+        matrix.scale(1.0 / scale._x, 1.0 / scale._y, 1.0 / scale._z);
+        tempMat.setToRotationTranslationScale(euler.quaternion, 0, 0, 0, 1, 1, 1);
+        matrix.setToMult(matrix, tempMat);
+        matrix.translate(-pos._x, -pos._y, -pos._z);
+
+        this.local._dirtyId++;
+    }
 }

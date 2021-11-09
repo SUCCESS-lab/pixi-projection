@@ -106,6 +106,16 @@ export class Matrix3d
         this.mat4[13] = value * this.mat4[15];
     }
 
+    get tz(): number
+    {
+        return this.mat4[14] / this.mat4[15];
+    }
+
+    set tz(value: number)
+    {
+        this.mat4[14] = value * this.mat4[15];
+    }
+
     set(a: number, b: number, c: number, d: number, tx: number, ty: number): this
     {
         const mat4 = this.mat4;
@@ -551,6 +561,21 @@ export class Matrix3d
         mat3[13] = matrix.ty;
         mat3[14] = 0;
         mat3[15] = 1;
+
+        this._dirtyId++;
+
+        return this;
+    }
+
+    copyFrom3d(matrix3d: Matrix3d): this
+    {
+        const mat3 = this.mat4;
+        const mat4 = matrix3d.mat4;
+
+        for (let i = 0; i <= 15; i++)
+        {
+            mat3[i] = mat4[i];
+        }
 
         this._dirtyId++;
 
